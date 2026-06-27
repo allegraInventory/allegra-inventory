@@ -570,11 +570,11 @@
   };
 
   const TYPE_BY_CATEGORY = {
-    'Small Props':       ['Food','Homewear','Plants','Party Decorations','Sports','Games','Ropes','Electronics','Misc Props'],
-    'Body Accessories':  ['Masks / Headbands','Non Funky Hats','Funky Hats','Straw Hats','Animal Hats','Shoes','Umbrellas','Boas','Bandanas','Scarves','Ties','Aprons','Suspenders','Wigs','Gloves and Socks','Misc Accessories'],
-    'Fabrics':           ['Linens','Sparkly','Misc Fabrics'],
-    'Large Props':       ['Weapons','Loose Fabrics','Furniture','Bags & Suitcases','Misc'],
-    'Clothing':          ['Tops','Cardigans / Blazers / Coats','Trousers','Skirts','Dresses','T-Shirts','Weird'],
+    'Small Props':       ['Electronics','Food','Games','Homewear','Misc Props','Party Decorations','Plants','Ropes','Sports'],
+    'Body Accessories':  ['Animal Hats','Aprons','Bandanas','Boas','Funky Hats','Gloves and Socks','Masks / Headbands','Misc Accessories','Non Funky Hats','Scarves','Shoes','Straw Hats','Suspenders','Ties','Umbrellas','Wigs'],
+    'Large Props':       ['Bags & Suitcases','Furniture','Loose Fabrics','Misc','Weapons'],
+    'Clothing':          ['Cardigans / Blazers / Coats','Dresses','Skirts','T-Shirts','Tops','Trousers','Weird'],
+    'Fabrics':           ['Linens','Misc Fabrics','Sparkly'],
   };
 
   // ── State ───────────────────────────────────────────────────
@@ -706,7 +706,7 @@
     const prev = sel.value;
     sel.innerHTML = '<option value="">All types</option>';
     const types = cat ? (TYPE_BY_CATEGORY[cat] || []) : Object.values(TYPE_BY_CATEGORY).flat();
-    types.forEach(t => {
+    types.slice().sort((a, b) => a.localeCompare(b)).forEach(t => {
       const o = document.createElement('option');
       o.value = o.textContent = t;
       if (t === prev) o.selected = true;
