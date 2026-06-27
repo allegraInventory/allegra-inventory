@@ -178,11 +178,11 @@
       white-space: nowrap;
     }
 
-    /* ── Card grid ───────────────────────────────────────────── */
+    /* ── List rows ───────────────────────────────────────────── */
     #grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(var(--card-w), 1fr));
-      gap: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .card {
@@ -191,40 +191,62 @@
       border-radius: var(--radius);
       overflow: hidden;
       cursor: pointer;
-      transition: transform 0.15s, border-color 0.15s;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
     }
     .card:hover {
-      transform: translateY(-3px);
       border-color: var(--accent);
+      background: var(--surface2);
     }
 
-    .card-img {
-      width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      background: var(--surface2);
-      display: block;
-    }
-    .card-no-img {
-      width: 100%;
-      aspect-ratio: 4/3;
+    .card-img-wrap {
+      width: 110px;
+      flex-shrink: 0;
       background: var(--surface2);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--border);
-      font-size: 36px;
+      padding: 8px;
+      border-right: 1px solid var(--border);
+    }
+    .card-img {
+      max-width: 100%;
+      max-height: 90px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 4px;
+    }
+    .card-no-img {
+      width: 110px;
+      flex-shrink: 0;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      padding: 8px;
+      border-right: 1px solid var(--border);
     }
 
     .card-body {
-      padding: 14px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      min-width: 0;
     }
 
     .card-top {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
     }
 
     .zone-badge {
@@ -234,11 +256,13 @@
       padding: 3px 8px;
       border-radius: 20px;
       color: #000;
+      white-space: nowrap;
     }
 
     .location-tag {
       font-size: 11px;
       color: var(--muted);
+      white-space: nowrap;
     }
 
     .card-type {
@@ -307,10 +331,12 @@
 
     #modal-img {
       width: 100%;
-      max-height: 340px;
-      object-fit: cover;
+      max-height: 420px;
+      object-fit: contain;
       display: block;
+      background: var(--surface2);
       border-radius: var(--radius) var(--radius) 0 0;
+      padding: 16px;
     }
     #modal-no-img {
       width: 100%;
@@ -622,9 +648,8 @@
       return `
         <div class="card" data-idx="${idx}" tabindex="0" role="button" aria-label="${item['Type'] || 'Item'}">
           ${img
-            ? `<img class="card-img" src="${img}" alt="${item['Type'] || 'Item'}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-            : ''}
-          <div class="card-no-img" style="${img ? 'display:none' : ''}">🎭</div>
+            ? `<div class="card-img-wrap"><img class="card-img" src="${img}" alt="${item['Type'] || 'Item'}" loading="lazy" onerror="this.parentElement.outerHTML='<div class=card-no-img>🎭</div>'"></div>`
+            : '<div class="card-no-img">🎭</div>'}
           <div class="card-body">
             <div class="card-top">
               <span class="zone-badge" style="background:${zc.hex}">${zone} — ${zc.label}</span>
