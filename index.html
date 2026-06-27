@@ -41,7 +41,7 @@
       border-bottom: 1px solid var(--border);
       padding: 24px 32px;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 16px;
     }
     header h1 {
@@ -53,6 +53,21 @@
     header span {
       color: var(--muted);
       font-size: 13px;
+    }
+    .add-item-btn {
+      margin-left: auto;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .add-item-btn:hover {
+      opacity: 0.85;
     }
 
     /* ── Layout ─────────────────────────────────────────────── */
@@ -427,6 +442,7 @@
 <header>
   <h1>Allegra — Props & Costumes</h1>
   <span id="header-count"></span>
+  <a class="add-item-btn" href="https://forms.gle/oCRKneoX8Asct7838" target="_blank">+ Add Item</a>
 </header>
 
 <div class="shell">
@@ -607,17 +623,14 @@
 
   // ── Zone helpers ────────────────────────────────────────────
   function getZoneLetter(zoneField) {
-    // Field comes as "A — Orange", extract the letter
     if (!zoneField) return '';
     return zoneField.trim().charAt(0).toUpperCase();
   }
 
   function photoUrl(raw) {
     if (!raw) return null;
-    // Handle "open?id=FILE_ID" format
     const match = raw.match(/[?&]id=([^&]+)/);
     if (match) return `https://lh3.googleusercontent.com/d/${match[1]}`;
-    // Handle direct file URL format e.g. /d/FILE_ID/view
     const match2 = raw.match(/\/d\/([^/]+)\//);
     if (match2) return `https://lh3.googleusercontent.com/d/${match2[1]}`;
     return null;
@@ -664,7 +677,6 @@
         </div>`;
     }).join('');
 
-    // Click handlers
     grid.querySelectorAll('.card').forEach(card => {
       const open = () => openModal(items[+card.dataset.idx]);
       card.addEventListener('click', open);
@@ -719,7 +731,6 @@
     const zc = ZONE_COLORS[zone] || { hex: '#555', label: '' };
     const img = photoUrl(item['Item image']);
 
-    // Image
     const wrap = document.getElementById('modal-img-wrap');
     if (img) {
       wrap.innerHTML = `<img id="modal-img" src="${img}" alt="${item['Type'] || 'Item'}" onerror="this.parentElement.innerHTML='<div id=modal-no-img>🎭</div>'">`;
@@ -727,7 +738,6 @@
       wrap.innerHTML = '<div id="modal-no-img">🎭</div>';
     }
 
-    // Badge + type
     const storageLocation = [item['Storage Type'], item['Storage Number']].filter(Boolean).join(' ');
     const modalBadgeLabel = storageLocation ? `${zone} — ${storageLocation}` : zone;
     const badge = document.getElementById('modal-zone-badge');
@@ -735,7 +745,6 @@
     badge.style.background = zc.hex;
     document.getElementById('modal-type').textContent = item['Type'] || '—';
 
-    // Details grid
     const details = [
       { label: 'Category',   value: item['Category'] },
       { label: 'Zone',       value: item['Zone'] },
@@ -749,7 +758,6 @@
       .map(d => `<div class="detail-item"><div class="detail-label">${d.label}</div><div class="detail-value">${d.value}</div></div>`)
       .join('');
 
-    // Notes
     const notesWrap = document.getElementById('modal-notes-wrap');
     if (item['Notes']) {
       notesWrap.style.display = 'block';
