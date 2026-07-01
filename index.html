@@ -119,12 +119,42 @@
     #loading::after { content: ''; display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin-left: 10px; vertical-align: middle; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── Mobile filter drawer ── */
+    #filter-fab { display: none; }
+    #drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; }
+    #drawer-overlay.open { display: block; }
+    #filter-drawer {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 201;
+      background: var(--surface); border-top: 1px solid var(--border);
+      border-radius: 16px 16px 0 0; padding: 16px 20px 40px;
+      display: flex; flex-direction: column; gap: 20px;
+      max-height: 85vh; overflow-y: auto;
+      transform: translateY(100%); transition: transform 0.3s ease;
+    }
+    #filter-drawer.open { transform: translateY(0); }
+    .drawer-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 4px; flex-shrink: 0; }
+    .drawer-header { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .drawer-header h2 { font-size: 16px; font-weight: 600; }
+    .drawer-close { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; padding: 4px; line-height: 1; }
+    #drawer-reset { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 12px; padding: 10px; cursor: pointer; width: 100%; margin-top: 4px; }
+
     /* ── Responsive ── */
     @media (max-width: 700px) {
       aside { display: none; }
-      header { padding: 16px; }
-      main { padding: 16px; }
+      header { padding: 14px 16px; }
+      header h1 { font-size: 20px; }
+      main { padding: 14px 16px; }
       .detail-grid { grid-template-columns: 1fr; }
+      #search-input { flex: 1; width: auto; min-width: 0; }
+      .toolbar { flex-wrap: nowrap; }
+      #filter-fab {
+        display: flex; align-items: center; gap: 6px;
+        background: var(--surface2); border: 1px solid var(--border);
+        border-radius: 6px; color: var(--text); font-family: 'Inter', sans-serif;
+        font-size: 13px; font-weight: 600; padding: 9px 14px;
+        cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      }
+      #filter-fab.has-filters { border-color: var(--accent); color: var(--accent); }
     }
   </style>
 </head>
@@ -206,10 +236,84 @@
   <main>
     <div class="toolbar">
       <input type="text" id="search-input" placeholder="Search by type, category, notes…" />
+      <button id="filter-fab">⚙ Filters</button>
       <span id="result-count"></span>
     </div>
     <div id="grid"><div id="loading">Loading inventory</div></div>
   </main>
+</div>
+
+<!-- Mobile filter drawer -->
+<div id="drawer-overlay"></div>
+<div id="filter-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <h2>Filters</h2>
+    <button class="drawer-close" id="drawer-close">×</button>
+  </div>
+  <div class="filter-group">
+    <label>Zone</label>
+    <div class="zone-pills" id="zone-pills-drawer">
+      <div class="zone-pill active" data-zone="all"><span class="zone-dot" style="background:#555"></span> All zones</div>
+      <div class="zone-pill" data-zone="A"><span class="zone-dot" style="background:var(--zone-a)"></span> A — Small Props</div>
+      <div class="zone-pill" data-zone="B"><span class="zone-dot" style="background:var(--zone-b)"></span> B — Body Accessories</div>
+      <div class="zone-pill" data-zone="C"><span class="zone-dot" style="background:var(--zone-c)"></span> C — Large Props</div>
+      <div class="zone-pill" data-zone="D"><span class="zone-dot" style="background:var(--zone-d)"></span> D — Clothing</div>
+      <div class="zone-pill" data-zone="E"><span class="zone-dot" style="background:var(--zone-e)"></span> E — Fabrics</div>
+    </div>
+  </div>
+  <div class="filter-group">
+    <label>Status</label>
+    <select id="drawer-status">
+      <option value="">All items</option>
+      <option value="Available">Available</option>
+      <option value="Checked Out">Checked Out</option>
+      <option value="Missing">Missing</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Category</label>
+    <select id="drawer-category">
+      <option value="">All categories</option>
+      <option>Small Props</option>
+      <option>Body Accessories</option>
+      <option>Fabrics</option>
+      <option>Large Props</option>
+      <option>Clothing</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Type</label>
+    <select id="drawer-type"><option value="">All types</option></select>
+  </div>
+  <div class="filter-group">
+    <label>Color</label>
+    <select id="drawer-color">
+      <option value="">All colors</option>
+      <option>Purple</option><option>Blue</option><option>Green</option>
+      <option>Yellow</option><option>Orange</option><option>Red</option>
+      <option>Black</option><option>White</option><option>Grey</option>
+      <option>Silver</option><option>Gold</option><option>Brown</option>
+      <option>Bronze</option><option>Multicolored</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Size</label>
+    <select id="drawer-size">
+      <option value="">All sizes</option>
+      <option>S</option><option>M</option><option>L</option>
+      <option>XL</option><option>XXL</option><option>One Size</option><option>See Notes</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Storage Type</label>
+    <select id="drawer-storage">
+      <option value="">All storage</option>
+      <option>Rack</option><option>Box</option><option>Shelf</option>
+      <option>Floor</option><option>Other</option>
+    </select>
+  </div>
+  <button id="drawer-reset">Reset all filters</button>
 </div>
 
 <!-- Detail + checkout modal -->
@@ -254,7 +358,7 @@
 <script>
   // ── Config ──────────────────────────────────────────────────
   // IMPORTANT: Replace with your deployed Apps Script web app URL
-  const API_URL = 'https://script.google.com/macros/s/AKfycbxuafZvubpVvEKCytNnHNuz47d4daa9tbfYMSJYVemxe4ykbQ7jBKUlrH-3N0qcjwq4/exec';
+  const API_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
 
   const ZONE_COLORS = {
     A: { hex: '#E87722', label: 'Small Props' },
@@ -644,6 +748,133 @@
 
   updateTypeDropdown('');
   loadInventory();
+
+  // ── Mobile drawer ────────────────────────────────────────────
+  function openDrawer() {
+    document.getElementById('filter-drawer').classList.add('open');
+    document.getElementById('drawer-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    document.getElementById('filter-drawer').classList.remove('open');
+    document.getElementById('drawer-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function updateDrawerTypeDropdown(cat) {
+    const sel = document.getElementById('drawer-type');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">All types</option>';
+    const types = cat ? (TYPE_BY_CATEGORY[cat] || []) : Object.values(TYPE_BY_CATEGORY).flat();
+    types.slice().sort((a, b) => a.localeCompare(b)).forEach(t => {
+      const o = document.createElement('option');
+      o.value = o.textContent = t;
+      if (t === prev) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+
+  function syncDrawerToSidebar() {
+    // Keep drawer values in sync with sidebar values
+    document.getElementById('drawer-status').value   = document.getElementById('filter-status').value;
+    document.getElementById('drawer-category').value = document.getElementById('filter-category').value;
+    document.getElementById('drawer-color').value    = document.getElementById('filter-color').value;
+    document.getElementById('drawer-size').value     = document.getElementById('filter-size').value;
+    document.getElementById('drawer-storage').value  = document.getElementById('filter-storage').value;
+    updateDrawerTypeDropdown(document.getElementById('filter-category').value);
+    document.getElementById('drawer-type').value     = document.getElementById('filter-type').value;
+    // Sync zone pills
+    document.querySelectorAll('#zone-pills-drawer .zone-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.zone === activeZone);
+    });
+  }
+
+  function syncSidebarToDrawer() {
+    document.getElementById('filter-status').value   = document.getElementById('drawer-status').value;
+    document.getElementById('filter-category').value = document.getElementById('drawer-category').value;
+    document.getElementById('filter-color').value    = document.getElementById('drawer-color').value;
+    document.getElementById('filter-size').value     = document.getElementById('drawer-size').value;
+    document.getElementById('filter-storage').value  = document.getElementById('drawer-storage').value;
+    updateTypeDropdown(document.getElementById('drawer-category').value);
+    document.getElementById('filter-type').value     = document.getElementById('drawer-type').value;
+  }
+
+  function updateFabState() {
+    const hasFilters = activeZone !== 'all' ||
+      document.getElementById('filter-status').value ||
+      document.getElementById('filter-category').value ||
+      document.getElementById('filter-color').value ||
+      document.getElementById('filter-size').value ||
+      document.getElementById('filter-storage').value ||
+      document.getElementById('filter-type').value;
+    document.getElementById('filter-fab').classList.toggle('has-filters', !!hasFilters);
+    document.getElementById('filter-fab').textContent = hasFilters ? '⚙ Filters ●' : '⚙ Filters';
+  }
+
+  document.getElementById('filter-fab').addEventListener('click', () => {
+    syncDrawerToSidebar();
+    openDrawer();
+  });
+
+  document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+  document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+
+  // Drawer filter changes apply immediately
+  ['drawer-status','drawer-color','drawer-size','drawer-storage'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+      syncSidebarToDrawer();
+      applyFilters();
+      updateFabState();
+    });
+  });
+
+  document.getElementById('drawer-category').addEventListener('change', function() {
+    updateDrawerTypeDropdown(this.value);
+    syncSidebarToDrawer();
+    applyFilters();
+    updateFabState();
+  });
+
+  document.getElementById('drawer-type').addEventListener('change', () => {
+    syncSidebarToDrawer();
+    applyFilters();
+    updateFabState();
+  });
+
+  document.getElementById('zone-pills-drawer').addEventListener('click', e => {
+    const pill = e.target.closest('.zone-pill');
+    if (!pill) return;
+    document.querySelectorAll('#zone-pills-drawer .zone-pill').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('#zone-pills .zone-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    // Sync sidebar zone pill
+    const sidebarPill = document.querySelector(`#zone-pills .zone-pill[data-zone="${pill.dataset.zone}"]`);
+    if (sidebarPill) sidebarPill.classList.add('active');
+    activeZone = pill.dataset.zone;
+    applyFilters();
+    updateFabState();
+  });
+
+  document.getElementById('drawer-reset').addEventListener('click', () => {
+    document.getElementById('search-input').value = '';
+    ['filter-status','filter-category','filter-color','filter-size','filter-storage',
+     'drawer-status','drawer-category','drawer-color','drawer-size','drawer-storage'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    updateTypeDropdown('');
+    updateDrawerTypeDropdown('');
+    document.getElementById('filter-type').value = '';
+    document.getElementById('drawer-type').value = '';
+    activeZone = 'all';
+    document.querySelectorAll('.zone-pill').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.zone-pill[data-zone="all"]').forEach(p => p.classList.add('active'));
+    applyFilters();
+    updateFabState();
+    closeDrawer();
+  });
+
+  updateDrawerTypeDropdown('');
 </script>
 </body>
 </html>
